@@ -1,0 +1,23 @@
+
+### `Jenkinsfile`
+
+```groovy
+pipeline {
+    agent any
+
+    parameters {
+        choice(
+            choices: ["TEST", "Dev", "QA", "Pre-Prod", "Prod"], 
+            description: "Which environment to deploy in", 
+            name: "deployEnv"
+        )
+    }
+
+    stages {
+        stage("Demo") {
+            steps {
+                echo "Choice is set to: ${params.deployEnv}"
+            }
+        }
+    }
+}
