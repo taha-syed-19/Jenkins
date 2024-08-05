@@ -1,0 +1,35 @@
+
+### `Jenkinsfile`
+
+```groovy
+pipeline {
+    agent any
+
+    parameters {
+        string(
+            defaultValue: "", 
+            description: "Deployment Name?", 
+            name: "deployName"
+        )
+        choice(
+            choices: ["Eu-west-1a", "Eu-west-1b", "Eu-west-1c"], 
+            description: "Av Zone", 
+            name: "azDeploy"
+        )
+        booleanParam(
+            defaultValue: false, 
+            description: "Confirm Deployment?", 
+            name: "confirmDeploy"
+        )
+    }
+
+    stages {
+        stage("Deploy") {
+            steps {
+                echo "String set to ${params.deployName}"
+                echo "Choice set to ${params.azDeploy}"
+                echo "Boolean set to ${params.confirmDeploy}"
+            }
+        }
+    }
+}
