@@ -13,8 +13,8 @@ pipeline {
             steps {
                 script {
                     try {
-                        // Adjusted to the correct relative path
-                        gv = load "Jenkins/test/script.groovy"
+                        // Correct relative path within the Jenkins workspace
+                        gv = load "test/script.groovy"
                         echo "Loaded script.groovy successfully."
                     } catch (Exception e) {
                         error "Failed to load script.groovy: ${e.message}"
