@@ -1,13 +1,27 @@
+def gv
+
 pipeline {
     agent any
     parameters {
         choice(name:'VERSION', choices:['1.1', '1.2', '1.4'], description: "Choose the version you want to deploy")
-        booleanParam(name: 'executeTests', defaultValue: true, description: " ")
+        booleanParam(name: 'execute tests', defaultValue: true, description: " ")
     }
 
     stages {
+
+        stage ("init") {
+            steps {
+                script {
+                    gv = load "script.groovy"
+                }
+
+            }
+        }
         stage ("Build") {
             steps {
+                script {
+                    gv.buildApp()
+                }
                 echo 'building the application based on server you selected'
 
             }
@@ -20,14 +34,29 @@ pipeline {
                 }
             }
             steps {
+                script {
+                    gv.testApp()
+                }
                 echo 'Testing the App'
 
             }
         }
         stage ("Deploying") {
+            input {
+                message "Select which env you have to deploy to ?"
+                ok "Done"
+                parameters {
+                    choice(name:'ENV', choices:['sbx', 'preprod','Prod'], description: "Choose the version you want to deploy")
+
+                }
+            }
+
             steps {
+                script {
+                    gv.deployApp()
+                }
                 echo 'Deploying the App'
-                echo "Deploying version ${params.VERSION}"
+                echo "Deploying the env ${params.ENV}"
 
             }
             
