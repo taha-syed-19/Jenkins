@@ -1,0 +1,39 @@
+pipeline {
+    agent any
+    parameters {
+        choice(name:'VERSION', choices:['1.1', '1.2', '1.4'], description: "Choose the version you want to deploy")
+        booleanParam(name: 'execute tests', defaultValue: true, description: " ")
+    }
+
+    stages {
+        stage ("Build") {
+            steps {
+                echo 'building the application based on server you selected'
+
+            }
+        }
+        
+        stage ("Test") {
+            when {
+                expression {
+                    params.executeTests
+                }
+            }
+            steps {
+                echo 'Testing the App'
+
+            }
+        }
+        stage ("Deploying") {
+            steps {
+                echo 'Deploying the App'
+                echo 'Deploying version ${VERSION}'
+
+            }
+            
+        }
+        
+    }
+    
+
+}
