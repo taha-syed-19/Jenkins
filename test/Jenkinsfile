@@ -3,31 +3,36 @@ def gv
 pipeline {
     agent any
     parameters {
-        choice(name:'VERSION', choices:['1.1', '1.2', '1.4'], description: "Choose the version you want to deploy")
-        booleanParam(name: 'execute tests', defaultValue: true, description: " ")
+        choice(name: 'VERSION', choices: ['1.1', '1.2', '1.4'], description: "Choose the version you want to deploy")
+        booleanParam(name: 'executeTests', defaultValue: true, description: "Run tests?")
     }
 
     stages {
 
-        stage ("init") {
+        stage("Init") {
             steps {
                 script {
-                    gv = load "Jenkins/test/script.groovy"
+                    try {
+                        // Adjusted to the correct relative path
+                        gv = load "Jenkins/test/script.groovy"
+                        echo "Loaded script.groovy successfully."
+                    } catch (Exception e) {
+                        error "Failed to load script.groovy: ${e.message}"
+                    }
                 }
-
             }
         }
-        stage ("Build") {
+
+        stage("Build") {
             steps {
                 script {
                     gv.buildApp()
                 }
-                echo 'building the application based on server you selected'
-
+                echo 'Build stage completed.'
             }
         }
         
-        stage ("Test") {
+        stage("Test") {
             when {
                 expression {
                     params.executeTests
@@ -37,32 +42,24 @@ pipeline {
                 script {
                     gv.testApp()
                 }
-                echo 'Testing the App'
-
+                echo 'Test stage completed.'
             }
         }
-        stage ("Deploying") {
+
+        stage("Deploying") {
             input {
-                message "Select which env you have to deploy to ?"
+                message "Select which environment you want to deploy to."
                 ok "Done"
                 parameters {
-                    choice(name:'ENV', choices:['sbx', 'preprod','Prod'], description: "Choose the version you want to deploy")
-
+                    choice(name: 'ENV', choices: ['sbx', 'preprod', 'Prod'], description: "Select the environment to deploy to.")
                 }
             }
-
             steps {
                 script {
-                    gv.deployApp()
+                    gv.deployApp(params.VERSION)
                 }
-                echo 'Deploying the App'
-                echo "Deploying the env ${params.ENV}"
-
+                echo "Deploying to environment: ${params.ENV}"
             }
-            
         }
-        
     }
-    
-
 }
